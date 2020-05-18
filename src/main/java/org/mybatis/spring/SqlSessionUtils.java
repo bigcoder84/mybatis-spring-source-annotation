@@ -71,6 +71,9 @@ public final class SqlSessionUtils {
   }
 
   /**
+   * 从Spring事务管理器获取SqlSession，或者在需要时创建一个新的SqlSession。试图从当前事务获取SqlSession。如果没有，则创建一个新的。然后，
+   * 如果Spring TX是活动的，并且SpringManagedTransactionFactory被配置为事务管理器，那么它会将SqlSession与事务进行同步。
+   * <p/>
    * Gets an SqlSession from Spring Transaction Manager or creates a new one if needed. Tries to get a SqlSession out of
    * current transaction. If there is not any, it creates a new one. Then, it synchronizes the SqlSession with the
    * transaction if Spring TX is active and <code>SpringManagedTransactionFactory</code> is configured as a transaction
@@ -115,7 +118,7 @@ public final class SqlSessionUtils {
    * Note: The DataSource used by the Environment should be synchronized with the transaction either through
    * DataSourceTxMgr or another tx synchronization. Further assume that if an exception is thrown, whatever started the
    * transaction will handle closing / rolling back the Connection associated with the SqlSession.
-   * 
+   *
    * @param sessionFactory
    *          sqlSessionFactory used for registration.
    * @param executorType

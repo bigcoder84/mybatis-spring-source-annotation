@@ -28,7 +28,7 @@ import org.springframework.dao.support.DaoSupport;
  * <p>
  * This class needs a SqlSessionTemplate or a SqlSessionFactory. If both are set the SqlSessionFactory will be ignored.
  * <p>
- * 
+ *
  * @author Putthiphong Boonphong
  * @author Eduardo Macarron
  *
@@ -48,6 +48,8 @@ public abstract class SqlSessionDaoSupport extends DaoSupport {
    *          a factory of SqlSession
    */
   public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
+    //当我们配置<property name="sqlSessionFactory" ref="sqlSessionFactory"></property>时
+    //会调用这个方法，并创建SqlSessionTemplate封装SqlSessionFactory
     if (this.sqlSessionTemplate == null || sqlSessionFactory != this.sqlSessionTemplate.getSqlSessionFactory()) {
       this.sqlSessionTemplate = createSqlSessionTemplate(sqlSessionFactory);
     }
@@ -59,7 +61,7 @@ public abstract class SqlSessionDaoSupport extends DaoSupport {
    * <p>
    * Can be overridden in subclasses to provide a SqlSessionTemplate instance with different configuration, or a custom
    * SqlSessionTemplate subclass.
-   * 
+   *
    * @param sqlSessionFactory
    *          the MyBatis SqlSessionFactory to create a SqlSessionTemplate for
    * @return the new SqlSessionTemplate instance
@@ -91,6 +93,8 @@ public abstract class SqlSessionDaoSupport extends DaoSupport {
   }
 
   /**
+   * 用户应该使用这个方法来获取一个SqlSession来调用它的语句方法，这个SqlSession是由spring管理的。
+   * 用户不应该提交/回滚/关闭它，因为它将自动完成。
    * Users should use this method to get a SqlSession to call its statement methods This is SqlSession is managed by
    * spring. Users should not commit/rollback/close it because it will be automatically done.
    *
