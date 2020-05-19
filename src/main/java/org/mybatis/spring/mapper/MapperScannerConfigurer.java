@@ -91,6 +91,7 @@ import org.springframework.util.StringUtils;
 public class MapperScannerConfigurer
     implements BeanDefinitionRegistryPostProcessor, InitializingBean, ApplicationContextAware, BeanNameAware {
 
+  //用于指定扫描的包
   private String basePackage;
 
   private boolean addToConfig = true;
@@ -105,12 +106,15 @@ public class MapperScannerConfigurer
 
   private String sqlSessionTemplateBeanName;
 
+  //Mapper接口上有指定的注解才会扫描
   private Class<? extends Annotation> annotationClass;
 
+  //Mapper接口继承于指定接口时才会扫描
   private Class<?> markerInterface;
 
   private Class<? extends MapperFactoryBean> mapperFactoryBeanClass;
 
+  //Spring容器上下文
   private ApplicationContext applicationContext;
 
   private String beanName;
@@ -338,7 +342,11 @@ public class MapperScannerConfigurer
       processPropertyPlaceHolders();
     }
 
+    //创建类路径Mapper扫描器
     ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
+    /**
+     * 设置扫描器属性
+     */
     scanner.setAddToConfig(this.addToConfig);
     scanner.setAnnotationClass(this.annotationClass);
     scanner.setMarkerInterface(this.markerInterface);
@@ -352,7 +360,9 @@ public class MapperScannerConfigurer
     if (StringUtils.hasText(lazyInitialization)) {
       scanner.setLazyInitialization(Boolean.valueOf(lazyInitialization));
     }
+    //生成过滤器，只扫描指定类
     scanner.registerFilters();
+    //扫描指定包及其子包
     scanner.scan(
         StringUtils.tokenizeToStringArray(this.basePackage, ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS));
   }

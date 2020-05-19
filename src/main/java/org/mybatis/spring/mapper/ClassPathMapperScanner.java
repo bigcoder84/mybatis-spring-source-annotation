@@ -45,7 +45,7 @@ import java.util.Set;
  *
  * @author Hunter Presnall
  * @author Eduardo Macarron
- * 
+ *
  * @see MapperFactoryBean
  * @since 1.2.0
  */
@@ -178,18 +178,24 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
    */
   @Override
   public Set<BeanDefinitionHolder> doScan(String... basePackages) {
+    //调用父类的扫描，获取所有符合条件的BeanDefinitionHolder对象
     Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
 
     if (beanDefinitions.isEmpty()) {
       LOGGER.warn(() -> "No MyBatis mapper was found in '" + Arrays.toString(basePackages)
           + "' package. Please check your configuration.");
     } else {
+      //处理扫描后的BeanDefinitionHolder集合，将集合中的每一个Mapper接口转换为MapperFactoryBean
       processBeanDefinitions(beanDefinitions);
     }
 
     return beanDefinitions;
   }
 
+  /**
+   * 遍历处理BeanDefinitionHolder将其转换为MapperFactoryBean对象，并注入Spring容器
+   * @param beanDefinitions
+   */
   private void processBeanDefinitions(Set<BeanDefinitionHolder> beanDefinitions) {
     GenericBeanDefinition definition;
     for (BeanDefinitionHolder holder : beanDefinitions) {
@@ -200,9 +206,11 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
 
       // the mapper interface is the original class of the bean
       // but, the actual class of the bean is MapperFactoryBean
+      //Mapper接口是原始的Bean，但实际上的实例是MapperFactoryBean
       definition.getConstructorArgumentValues().addGenericArgumentValue(beanClassName); // issue #59
+      //设置真实的实例类型
       definition.setBeanClass(this.mapperFactoryBeanClass);
-
+      //增加addToConfig属性
       definition.getPropertyValues().add("addToConfig", this.addToConfig);
 
       boolean explicitFactoryUsed = false;
@@ -214,7 +222,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
         definition.getPropertyValues().add("sqlSessionFactory", this.sqlSessionFactory);
         explicitFactoryUsed = true;
       }
-
+      //增加SqlSessionTemplate属性
       if (StringUtils.hasText(this.sqlSessionTemplateBeanName)) {
         if (explicitFactoryUsed) {
           LOGGER.warn(
@@ -232,6 +240,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
         explicitFactoryUsed = true;
       }
 
+      //将自动注入的方式修改为AUTOWIRE_BY_TYPE
       if (!explicitFactoryUsed) {
         LOGGER.debug(() -> "Enabling autowire by type for MapperFactoryBean with name '" + holder.getBeanName() + "'.");
         definition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
