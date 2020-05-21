@@ -533,11 +533,11 @@ public class SqlSessionFactoryBean
       } else if (this.configurationProperties != null) {
         targetConfiguration.getVariables().putAll(this.configurationProperties);
       }
-    } else if (this.configLocation != null) {//对应configLocation属性
+    } else if (this.configLocation != null) {//如果配置了configLocation属性
       //创建XMLConfigBuilder，读取Mybatis核心配置文件
       xmlConfigBuilder = new XMLConfigBuilder(this.configLocation.getInputStream(), null, this.configurationProperties);
       targetConfiguration = xmlConfigBuilder.getConfiguration();
-    } else {
+    } else {//如果既没配configuration也没配configLocation属性，则加载当前SqlSeessionFactoryBean对象中配置的信息
       LOGGER.debug(
           () -> "Property 'configuration' or 'configLocation' not specified, using default MyBatis Configuration");
       targetConfiguration = new Configuration();
@@ -655,6 +655,7 @@ public class SqlSessionFactoryBean
   @Override
   public SqlSessionFactory getObject() throws Exception {
     if (this.sqlSessionFactory == null) {
+      //创建SqlSessionFactory对象
       afterPropertiesSet();
     }
     return this.sqlSessionFactory;
